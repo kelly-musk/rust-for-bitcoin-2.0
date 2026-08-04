@@ -10,7 +10,11 @@ pub fn decode_verbose_transaction<C: RpcClient>(
     client: &C,
     txid: &str,
 ) -> LabResult<DecodedTransaction> {
-    let raw = client.call(None, "getrawtransaction", &[txid.to_string(), "2".to_string()])?;
+    let raw = client.call(
+        None,
+        "getrawtransaction",
+        &[txid.to_string(), "2".to_string()],
+    )?;
     let value = parse_cli_value(&raw)?;
 
     let inputs = value
@@ -127,7 +131,11 @@ pub fn identify_payment_and_change(
 
 /// Calculate `sum(inputs) - sum(outputs)`.
 pub fn calculate_fee(transaction: &DecodedTransaction) -> LabResult<f64> {
-    let sum_inputs: f64 = transaction.inputs.iter().map(|input| input.previous_value).sum();
+    let sum_inputs: f64 = transaction
+        .inputs
+        .iter()
+        .map(|input| input.previous_value)
+        .sum();
     let sum_outputs: f64 = transaction.outputs.iter().map(|output| output.value).sum();
     let fee = sum_inputs - sum_outputs;
 

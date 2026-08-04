@@ -64,7 +64,11 @@ pub fn mine_additional_blocks<C: RpcClient>(
     miner_address: &str,
     count: u64,
 ) -> LabResult<Vec<String>> {
-    let raw = client.call(None, "generatetoaddress", &[count.to_string(), miner_address.to_string()])?;
+    let raw = client.call(
+        None,
+        "generatetoaddress",
+        &[count.to_string(), miner_address.to_string()],
+    )?;
     let value = parse_cli_value(&raw)?;
 
     match value {

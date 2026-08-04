@@ -31,9 +31,9 @@ pub fn get_block_height<C: RpcClient>(client: &C) -> LabResult<u64> {
     // The response may come back as a JSON number or as a string containing a number,
     // so we handle both forms.
     match result {
-        Value::Number(number) => number.as_u64().ok_or_else(|| {
-            LabError::Parse("expected an unsigned block height".to_owned())
-        }),
+        Value::Number(number) => number
+            .as_u64()
+            .ok_or_else(|| LabError::Parse("expected an unsigned block height".to_owned())),
         Value::String(text) => text
             .parse::<u64>()
             .map_err(|error| LabError::Parse(error.to_string())),

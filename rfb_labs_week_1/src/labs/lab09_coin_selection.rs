@@ -1,6 +1,8 @@
 //! Lab 09 — force and audit multi-UTXO coin selection.
 
-use crate::labs::lab06_decode::{calculate_fee, decode_verbose_transaction, identify_payment_and_change};
+use crate::labs::lab06_decode::{
+    calculate_fee, decode_verbose_transaction, identify_payment_and_change,
+};
 use crate::model::{DecodedOutput, MultiUtxoAudit, OutPoint, PaymentAndChange, Utxo};
 use crate::rpc::{parse_cli_value, RpcClient};
 use crate::{LabError, LabResult};
@@ -57,7 +59,10 @@ pub fn confirmed_utxos_for_address<C: RpcClient>(
                         .and_then(Value::as_u64)
                         .map(|n| n as u32)
                         .ok_or(LabError::MissingField("vout"))?,
-                    address: item.get("address").and_then(Value::as_str).map(ToOwned::to_owned),
+                    address: item
+                        .get("address")
+                        .and_then(Value::as_str)
+                        .map(ToOwned::to_owned),
                     script_pub_key: item
                         .get("scriptPubKey")
                         .and_then(Value::as_str)

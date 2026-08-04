@@ -8,7 +8,11 @@ use crate::{LabError, LabResult};
 
 /// Mine exactly one block and return its hash.
 pub fn mine_one_block<C: RpcClient>(client: &C, miner_address: &str) -> LabResult<String> {
-    let raw = client.call(None, "generatetoaddress", &["1".to_string(), miner_address.to_string()])?;
+    let raw = client.call(
+        None,
+        "generatetoaddress",
+        &["1".to_string(), miner_address.to_string()],
+    )?;
     let value = parse_cli_value(&raw)?;
 
     match value {

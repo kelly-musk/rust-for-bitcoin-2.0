@@ -3,12 +3,12 @@
 use serde_json::Value;
 
 use crate::model::{OutPoint, Utxo};
-use crate::rpc::{RpcClient, parse_cli_value};
+use crate::rpc::{parse_cli_value, RpcClient};
 use crate::{LabError, LabResult};
 
 /// Return all UTXOs tracked by the selected wallet.
 pub fn list_unspent<C: RpcClient>(client: &C, wallet_name: &str) -> LabResult<Vec<Utxo>> {
-     let raw = client.call(Some(wallet_name), "listunspent", &[])?;
+    let raw = client.call(Some(wallet_name), "listunspent", &[])?;
     let value = parse_cli_value(&raw)?;
 
     match value {
@@ -26,7 +26,10 @@ pub fn list_unspent<C: RpcClient>(client: &C, wallet_name: &str) -> LabResult<Ve
                         .and_then(Value::as_u64)
                         .map(|n| n as u32)
                         .ok_or(LabError::MissingField("vout"))?,
-                    address: item.get("address").and_then(Value::as_str).map(ToOwned::to_owned),
+                    address: item
+                        .get("address")
+                        .and_then(Value::as_str)
+                        .map(ToOwned::to_owned),
                     script_pub_key: item
                         .get("scriptPubKey")
                         .and_then(Value::as_str)

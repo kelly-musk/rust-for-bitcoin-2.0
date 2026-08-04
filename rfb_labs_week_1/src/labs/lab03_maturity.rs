@@ -4,12 +4,16 @@ use serde_json::Value;
 
 use crate::labs::lab01_network::get_block_height;
 use crate::model::{CoinbaseMaturityReport, WalletBalances};
-use crate::rpc::{RpcClient, parse_cli_value};
+use crate::rpc::{parse_cli_value, RpcClient};
 use crate::{LabError, LabResult};
 
 /// Mine `count` blocks to an address and return the generated block hashes.
 pub fn mine_blocks<C: RpcClient>(client: &C, address: &str, count: u64) -> LabResult<Vec<String>> {
-   let raw = client.call(None, "generatetoaddress", &[count.to_string(), address.to_string()])?;
+    let raw = client.call(
+        None,
+        "generatetoaddress",
+        &[count.to_string(), address.to_string()],
+    )?;
     let value = parse_cli_value(&raw)?;
 
     match value {
@@ -27,7 +31,7 @@ pub fn mine_blocks<C: RpcClient>(client: &C, address: &str, count: u64) -> LabRe
 
 /// Read the wallet's trusted, untrusted-pending, and immature balances.
 pub fn get_balances<C: RpcClient>(client: &C, wallet_name: &str) -> LabResult<WalletBalances> {
-     let raw = client.call(Some(wallet_name), "getbalances", &[])?;
+    let raw = client.call(Some(wallet_name), "getbalances", &[])?;
     let value = parse_cli_value(&raw)?;
 
     let mine = value
@@ -67,7 +71,9 @@ pub fn attempt_payment<C: RpcClient>(
 
     match value {
         Value::String(txid) => Ok(txid),
-        other => Err(LabError::Parse(format!("expected txid string, got {other}"))),
+        other => Err(LabError::Parse(format!(
+            "expected txid string, got {other}"
+        ))),
     }
 }
 
@@ -78,16 +84,11 @@ pub fn demonstrate_coinbase_maturity<C: RpcClient>(
     miner_address: &str,
     receiver_address: &str,
 ) -> LabResult<CoinbaseMaturityReport> {
-   mine_blocks(client, miner_address, 1)?;
+    mine_blocks(client, miner_address, 1)?;
     let height_after_first_block = get_block_height(client)?;
     let balance_after_first_block = get_balances(client, miner_wallet)?;
 
-    let premature_spend_error = match attempt_payment(
-        client,
-        miner_wallet,
-        receiver_address,
-        1.0,
-    ) {
+    let premature_spend_error = match attempt_payment(client, miner_wallet, receiver_address, 1.0) {
         Ok(_) => return Err(LabError::Rpc("expected payment to fail".to_owned())),
         Err(LabError::Rpc(message)) => message,
         Err(other) => return Err(other),

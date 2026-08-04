@@ -22,7 +22,9 @@ pub fn send_btc<C: RpcClient>(
 
     match value {
         Value::String(txid) => Ok(txid),
-        other => Err(LabError::Parse(format!("expected txid string, got {other}"))),
+        other => Err(LabError::Parse(format!(
+            "expected txid string, got {other}"
+        ))),
     }
 }
 
